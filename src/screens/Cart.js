@@ -1,29 +1,44 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import cart from "../data/cart";
+import { useSelector } from "react-redux";
 import CartListItem from "../components/CartListItem";
 
-const CartTotal = () => (
-  <View style={styles.totalsContainer}>
-    <View style={styles.row}>
-      <Text style={styles.text}>Subtotal</Text>
-      <Text style={styles.text}>410,00 US$</Text>
+const CartTotal = () => {
+  const subtotal = useSelector((state) =>
+    state.cart.items.reduce(
+      (total, cartItem) => total + cartItem.product.price * cartItem.quantity,
+      0
+    )
+  );
+  const freeDeliveryFrom = useSelector((state) => state.cart.freeDeliveryFrom);
+  const deliveryFee = useSelector((state) => state.cart.deliveryFee);
+  const requiredDeliveryFee = freeDeliveryFrom >= subtotal ? deliveryFee : 0;
+  const total = requiredDeliveryFee + subtotal;
+
+  return (
+    <View style={styles.totalsContainer}>
+      <View style={styles.row}>
+        <Text style={styles.text}>Subtotal</Text>
+        <Text style={styles.text}>{subtotal} US$</Text>
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.text}>Delivery</Text>
+        <Text style={styles.text}>{requiredDeliveryFee} US$</Text>
+      </View>
+      <View style={styles.row}>
+        <Text style={styles.textBold}>Total</Text>
+        <Text style={styles.textBold}>{total} US$</Text>
+      </View>
     </View>
-    <View style={styles.row}>
-      <Text style={styles.text}>Delivery</Text>
-      <Text style={styles.text}>16,50 US$</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.textBold}>Total</Text>
-      <Text style={styles.textBold}>426,50 US$</Text>
-    </View>
-  </View>
-);
+  );
+};
 
 const Cart = () => {
+  const cartItems = useSelector((state) => state.cart.items);
+
   return (
     <>
       <FlatList
-        data={cart}
+        data={cartItems}
         renderItem={({ item }) => <CartListItem cartItem={item} />}
         ListFooterComponent={CartTotal}
       />
