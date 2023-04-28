@@ -8,10 +8,10 @@ import {
   Pressable,
   useWindowDimensions,
 } from "react-native";
-import products from "../data/products";
+import { useSelector } from "react-redux";
 
 const ProductDetailScreen = () => {
-  const product = products[0];
+  const product = useSelector((state) => state.products.selectedProduct);
 
   const { width } = useWindowDimensions();
 
